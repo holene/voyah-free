@@ -1,0 +1,33 @@
+---
+title: Welcome to Starlight
+description: Get started building your docs site with Starlight.
+template: splash # Remove or comment out this line to display the site sidebar on this page.
+hero:
+  tagline: Congrats on setting up a new Starlight project!
+  image:
+    file: ../../assets/houston.webp
+  actions:
+    - text: Get started
+      link: /index.mdx
+      icon: right-arrow
+    - text: Vehicle Specifications
+      link: /technical/vehicle-and-specifications
+      icon: right-arrow
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import { FileText, Monitor, Settings, Globe } from 'lucide-astro';
+
+## Voyah Free Documentation
+
+
+Welcome to the community documentation site for **Voyah Free**.  
+This collection is built from user-generated guides, translated manuals, and PDF resources.
+
+Use the sidebar to navigate topics such as:
+
+- <FileText size={18} class="inline-block align-middle mr-1" /> General vehicle information  
+- <Monitor size={18} class="inline-block align-middle mr-1" /> Trippelskjerm (Triple Display) user manual  
+- <Settings size={18} class="inline-block align-middle mr-1" /> Technical specifications  
+- <Globe size={18} class="inline-block align-middle mr-1" /> Regulatory background (ECO mode and EU requirements)
