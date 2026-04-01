@@ -7,7 +7,14 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "pipeline:extract": "sh -c 'PYTHONPATH=tools/pipeline python3 -m voyah_pipeline.cli extract'",
+    "pipeline:chunk": "sh -c 'PYTHONPATH=tools/pipeline python3 -m voyah_pipeline.cli chunk'",
+    "pipeline:canonicalize": "sh -c 'PYTHONPATH=tools/pipeline python3 -m voyah_pipeline.cli canonicalize'",
+    "pipeline:translate": "sh -c 'PYTHONPATH=tools/pipeline python3 -m voyah_pipeline.cli translate'",
+    "pipeline:qa": "sh -c 'PYTHONPATH=tools/pipeline python3 -m voyah_pipeline.cli qa'",
+    "pipeline:render": "sh -c 'PYTHONPATH=tools/pipeline python3 -m voyah_pipeline.cli render'",
+    "pipeline:all": "sh -c 'PYTHONPATH=tools/pipeline python3 -m voyah_pipeline.cli all'"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.36.2",
