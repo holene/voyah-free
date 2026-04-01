@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voyah-free.local/schemas/chunk.schema.json",
+  "title": "SemanticChunk",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "chunk_id",
+    "page_start",
+    "page_end",
+    "text",
+    "heading_hint",
+    "table_hint",
+    "image_refs",
+    "confidence"
+  ],
+  "properties": {
+    "chunk_id": { "type": "string", "minLength": 8 },
+    "page_start": { "type": "integer", "minimum": 1 },
+    "page_end": { "type": "integer", "minimum": 1 },
+    "text": { "type": "string" },
+    "heading_hint": { "type": ["string", "null"] },
+    "table_hint": { "type": "boolean" },
+    "image_refs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+  }
+}
