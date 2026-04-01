@@ -1,0 +1,10 @@
+{
+  "version": "1",
+  "terms": {
+    "Trippelskjerm": { "en": "Triple screen", "no": "Trippelskjerm" },
+    "Android Auto": { "en": "Android Auto", "no": "Android Auto" },
+    "Apple CarPlay": { "en": "Apple CarPlay", "no": "Apple CarPlay" },
+    "ECO mode": { "en": "ECO mode", "no": "ECO-modus" },
+    "WLTP": { "en": "WLTP", "no": "WLTP" }
+  }
+}

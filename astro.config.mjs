@@ -6,8 +6,21 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'My Docs',
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
+			title: 'Voyah Free Docs',
+			defaultLocale: 'root',
+			locales: {
+				root: {
+					label: 'English',
+					lang: 'en',
+				},
+				no: {
+					label: 'Norsk',
+					lang: 'no',
+				},
+			},
+			social: [
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' },
+			],
 			sidebar: [
 				{
 					label: 'Overview',
@@ -20,6 +33,10 @@ export default defineConfig({
 				{
 					label: 'Triplescreen',
 					autogenerate: { directory: 'triplescreen' },
+				},
+				{
+					label: 'From PDF sources',
+					autogenerate: { directory: 'from-sources' },
 				},
 			],
 		}),

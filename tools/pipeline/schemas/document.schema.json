@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voyah-free.local/schemas/document.schema.json",
+  "title": "ExtractedDocument",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "doc_id",
+    "source_pdf_path",
+    "sha256",
+    "source_lang",
+    "pages",
+    "extractor_version",
+    "ocr_used",
+    "created_at"
+  ],
+  "properties": {
+    "doc_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "source_pdf_path": { "type": "string" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "source_lang": { "type": "string", "enum": ["en", "no"] },
+    "pages": { "type": "integer", "minimum": 1 },
+    "extractor_version": { "type": "string" },
+    "ocr_used": { "type": "boolean" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "title_hint": { "type": "string" }
+  }
+}
