@@ -1,65 +1,143 @@
-# Starlight Starter Kit: Basics
+# Voyah Free Docs
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+Astro + Starlight documentation site for community-maintained `Voyah Free` documentation.
 
-```
-npm create astro@latest -- --template starlight
-```
+The repo contains two kinds of content:
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+- Hand-authored docs under `src/content/docs/overview/`, `src/content/docs/technical/`, and `src/content/docs/triplescreen/`
+- Generated docs from source PDFs under `src/content/docs/from-sources/` and `src/content/docs/no/from-sources/`
 
-## 🚀 Project Structure
+## Project Structure
 
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
+```text
 .
+├── docs/
 ├── public/
 ├── src/
-│   ├── assets/
-│   ├── content/
-│   │   └── docs/
-│   └── content.config.ts
+│   ├── content/docs/
+│   │   ├── overview/
+│   │   ├── technical/
+│   │   ├── triplescreen/
+│   │   ├── from-sources/
+│   │   └── no/from-sources/
+│   └── raw/
+│       ├── pdfs/
+│       ├── extracted/      # generated, gitignored
+│       └── normalized/     # generated, gitignored
+├── tools/pipeline/
 ├── astro.config.mjs
-├── package.json
-└── tsconfig.json
+└── package.json
 ```
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+## Local Development
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+Install the site dependencies and run the docs site:
 
-Static assets, like favicons, can be placed in the `public/` directory.
+```bash
+npm install
+npm run dev
+```
 
-## PDF → docs pipeline
+Useful commands:
 
-Source PDFs live in [`src/raw/pdfs/`](src/raw/pdfs/). A Python pipeline extracts text and images, builds canonical JSON, optionally translates via an OpenAI-compatible API, runs QA, and writes Starlight pages under `src/content/docs/from-sources/` (English) and `src/content/docs/no/from-sources/` (Norwegian when that is the PDF source language).
+| Command | Action |
+| :------ | :----- |
+| `npm run dev` | Start local dev server on `localhost:4321` |
+| `npm run build` | Build the site to `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run astro -- --help` | Show Astro CLI help |
+
+## PDF Extraction Pipeline
+
+The PDF pipeline is implemented in Python and wrapped by npm scripts. It reads PDFs from `src/raw/pdfs/`, generates intermediate JSON, optionally runs LLM-assisted stages, and renders MDX pages for Starlight.
+
+### One-time setup
+
+Use Python `3.11+` for the pipeline:
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+source .venv/bin/activate
 pip install -r tools/pipeline/requirements.txt
+```
+
+### Run the full pipeline
+
+1. Add one or more `.pdf` files to `src/raw/pdfs/`
+2. Activate the virtualenv
+3. Run:
+
+```bash
 npm run pipeline:all
 ```
 
-Optional env: `OPENAI_API_KEY` or `PIPELINE_LLM_API_KEY`, `PIPELINE_LLM_BASE_URL`, `PIPELINE_LLM_MODEL`, `PIPELINE_LLM_CANONICAL=1`.
+That command runs these stages in order:
 
-Intermediate outputs are gitignored (`src/raw/extracted/`, `src/raw/normalized/`). See [`docs/MIGRATION.md`](docs/MIGRATION.md) for replacing hand-written pages with generated ones.
+1. `extract`
+2. `chunk`
+3. `canonicalize`
+4. `translate`
+5. `qa`
+6. `render`
 
-## 🧞 Commands
+### Run individual stages
 
-All commands are run from the root of the project, from a terminal:
+| Command | Action |
+| :------ | :----- |
+| `npm run pipeline:extract` | Extract text/images from PDFs into `src/raw/extracted/` |
+| `npm run pipeline:chunk` | Build chunk JSON from extracted pages |
+| `npm run pipeline:canonicalize` | Build `canonical.*.json` into `src/raw/normalized/` |
+| `npm run pipeline:translate` | Create `translated.*.json` when LLM env is configured |
+| `npm run pipeline:qa` | Write `src/raw/extracted/qa-report.json` |
+| `npm run pipeline:render` | Render MDX pages and copy extracted images to `public/from-pdf/` |
+| `npm run pipeline:all` | Run the full pipeline end-to-end |
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run pipeline:all`    | Extract PDFs, normalize, translate (if key set), render MDX |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+If you need to force re-extraction even when the PDF hash has not changed, run the Python CLI directly:
 
-## 👀 Want to learn more?
+```bash
+PYTHONPATH=tools/pipeline python3 -m voyah_pipeline.cli extract --force
+```
 
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+### Output behavior
+
+- `src/raw/extracted/` contains extracted page JSON, chunks, images, OCR status, the manifest, and QA report
+- `src/raw/normalized/` contains canonical and translated document JSON per `doc_id`
+- `src/content/docs/from-sources/` contains English pages
+- `src/content/docs/no/from-sources/` contains Norwegian pages
+- `public/from-pdf/<doc_id>/` contains extracted images referenced by generated pages
+
+Language handling is based on the document’s detected source language:
+
+- If the source PDF is English, the canonical page is rendered to `src/content/docs/from-sources/`
+- If the source PDF is Norwegian, the canonical page is rendered to `src/content/docs/no/from-sources/`
+- If LLM translation is enabled, the pipeline also writes a translated counterpart into the opposite locale
+
+### LLM configuration
+
+Extraction, chunking, deterministic canonicalization, QA, and rendering are offline. No API key is required for those stages.
+
+Translation only runs when an OpenAI-compatible API is configured through one of:
+
+- `OPENAI_API_KEY`
+- `PIPELINE_LLM_API_KEY`
+
+Optional settings:
+
+- `PIPELINE_LLM_BASE_URL`
+- `PIPELINE_LLM_MODEL`
+- `PIPELINE_LLM_CANONICAL=1` to enable optional LLM polishing during canonicalization
+
+Without LLM credentials, `translate` produces no translated output, which is valid current behavior.
+
+### QA and generated content
+
+- QA output is written to `src/raw/extracted/qa-report.json`
+- The pipeline reports schema and content flags, but `pipeline:all` does not fail on non-schema QA findings
+- `src/raw/extracted/` and `src/raw/normalized/` are intentionally gitignored
+- Generated `.mdx` content under `from-sources/` should be committed so the site can build without rerunning Python locally
+
+See `docs/MIGRATION.md` for guidance on replacing overlapping manual pages with generated ones.
+
+## CI
+
+CI installs Python pipeline dependencies, runs the full pipeline, then installs Node dependencies and builds the Astro site. See `.github/workflows/docs-pipeline.yml`.

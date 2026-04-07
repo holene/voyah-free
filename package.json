@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
+    "ci": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "pipeline:extract": "sh -c 'PYTHONPATH=tools/pipeline python3 -m voyah_pipeline.cli extract'",
@@ -21,5 +22,9 @@
     "astro": "^5.6.1",
     "lucide-astro": "^0.553.0",
     "sharp": "^0.34.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "typescript": "^5.9.3"
   }
 }
